@@ -1,5 +1,6 @@
 using HomeAutomation.Server.Interfaces;
 using HomeAutomation.Server.Services;
+using HomeAutomation.Server.Services.Background;
 using HomeAutomation.Server.Services.Development;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +38,9 @@ namespace HomeAutomation.Server
                 services.AddSingleton<ILightingService, LightingService>();
                 services.AddSingleton<ITemperatureService, TemperatureService>();
             }
+
+            services.AddSingleton<ISolarEventsService, SolarEventsService>();
+            services.AddHostedService<LightingControlService>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
