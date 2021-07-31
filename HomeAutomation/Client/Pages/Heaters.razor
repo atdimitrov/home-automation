@@ -1,0 +1,40 @@
+﻿@page "/heaters"
+@inject HttpClient Http
+@using HomeAutomation.Shared 
+
+<h3>Heaters</h3>
+
+@if (this.heaters != null)
+{
+    @foreach (Heater heater in this.heaters)
+    {
+        <div style="margin: 10px">
+            <span>Heater @heater.Id - @heater.State</span>
+            <button class="btn btn-primary" @onclick="() => ToggleHeater(heater)">Toggle</button>
+        </div>
+    }
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private Heater[] heaters;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshHeaters();
+    }
+
+    private async Task ToggleHeater(Heater heater)
+    {
+        await Http.PostAsJsonAsync("api/Heaters/ToggleHeater", heater);
+        await RefreshHeaters();
+    }
+
+    private async Task RefreshHeaters()
+    {
+        this.heaters = await Http.GetFromJsonAsync<Heater[]>("api/Heaters/Get");
+    }
+}

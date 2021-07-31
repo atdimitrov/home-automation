@@ -1,0 +1,17 @@
+﻿@page "/temperature"
+@inject HttpClient Http
+
+<h3>Temperature</h3>
+
+<p>Current temperature: @currentTemperature</p>
+
+<button class="btn btn-primary" @onclick="FetchTemperature">Refresh</button>
+
+@code {
+    private double currentTemperature = 0;
+
+    private async Task FetchTemperature()
+    {
+        this.currentTemperature = await Http.GetFromJsonAsync<double>("api/Temperature");
+    }
+}

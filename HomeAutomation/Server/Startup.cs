@@ -1,27 +1,42 @@
+using HomeAutomation.Server.Interfaces;
+using HomeAutomation.Server.Services;
+using HomeAutomation.Server.Services.Development;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
 
 namespace HomeAutomation.Server
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            Env = env;
         }
 
         public IConfiguration Configuration { get; }
+
+        public IWebHostEnvironment Env { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            if (this.Env.IsDevelopment())
+            {
+                services.AddSingleton<IHeaterService, DevelopmentHeaterService>();
+                services.AddSingleton<ILightingService, DevelopmentLightingService>();
+                services.AddSingleton<ITemperatureService, DevelopmentTemperatureService>();
+            }
+            else
+            {
+                services.AddSingleton<IHeaterService, HeaterService>();
+                services.AddSingleton<ILightingService, LightingService>();
+                services.AddSingleton<ITemperatureService, TemperatureService>();
+            }
 
             services.AddControllersWithViews();
             services.AddRazorPages();

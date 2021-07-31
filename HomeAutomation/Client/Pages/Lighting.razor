@@ -1,0 +1,44 @@
+﻿@page "/lighting"
+@inject HttpClient Http
+@using HomeAutomation.Shared
+
+<h1>Lighting</h1>
+
+@if (this.state != null)
+{
+    <div style="margin: 10px">
+        <span>Lighting is @this.state</span>
+        <button class="btn btn-primary" @onclick="TurnOn">Turn on</button>
+        <button class="btn btn-primary" @onclick="TurnOff">Turn off</button>
+    </div>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private State? state = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await this.RefreshState();
+    }
+
+    private async Task RefreshState()
+    {
+        this.state = await Http.GetFromJsonAsync<State>("/api/lighting/getState");
+    }
+
+    private async Task TurnOn()
+    {
+        await Http.PostAsync("/api/lighting/turnOn", null);
+        await this.RefreshState();
+    }
+
+    private async Task TurnOff()
+    {
+        await Http.PostAsync("/api/lighting/turnOff", null);
+        await this.RefreshState();
+    }
+}

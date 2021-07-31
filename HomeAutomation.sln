@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAutomation.Server", "HomeAutomation\Server\HomeAutomation.Server.csproj", "{26F5CB72-BEFD-48FC-8114-2CD71078457D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.Server", "HomeAutomation\Server\HomeAutomation.Server.csproj", "{26F5CB72-BEFD-48FC-8114-2CD71078457D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAutomation.Client", "HomeAutomation\Client\HomeAutomation.Client.csproj", "{18979CDC-EA94-4D68-8286-3CA63C7187CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.Client", "HomeAutomation\Client\HomeAutomation.Client.csproj", "{18979CDC-EA94-4D68-8286-3CA63C7187CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeAutomation.Shared", "HomeAutomation\Shared\HomeAutomation.Shared.csproj", "{A1F88B6B-B2A3-4E28-B320-E61A63A9B90D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.Shared", "HomeAutomation\Shared\HomeAutomation.Shared.csproj", "{A1F88B6B-B2A3-4E28-B320-E61A63A9B90D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
