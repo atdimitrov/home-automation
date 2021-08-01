@@ -4,8 +4,10 @@ namespace HomeAutomation.Server.Interfaces
 {
     public interface ISolarEventsService
     {
-        SolarEvent GetNextEvent();
+        SolarEvent GetFirstEvent();
+        
+        SolarEvent GetSecondEvent();
 
-        UpcomingSolarEvents GetUpcomingEvents();
+        SolarEvent GetThirdEvent();
     }
 }

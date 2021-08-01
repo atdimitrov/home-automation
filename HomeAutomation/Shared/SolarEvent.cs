@@ -2,7 +2,7 @@
 
 namespace HomeAutomation.Shared
 {
-    public class SolarEvent
+    public class SolarEvent : IEquatable<SolarEvent>
     {
         public SolarEvent(SolarEventType type, DateTime timestamp)
         {
@@ -18,5 +18,18 @@ namespace HomeAutomation.Shared
 
         public SolarEventType Type { get; }
         public DateTime Timestamp { get; }
+
+        public override string ToString() => $"{this.Type} at {this.Timestamp}";
+
+        public override bool Equals(object obj) => this.Equals(obj as SolarEvent);
+
+        public override int GetHashCode() => $"{this.Type}{this.Timestamp}".GetHashCode();
+
+        public bool Equals(SolarEvent other) =>
+            this.Type == other.Type && this.Timestamp == other.Timestamp;
+
+        public static bool operator ==(SolarEvent a, SolarEvent b) => a.Equals(b);
+
+        public static bool operator !=(SolarEvent a, SolarEvent b) => !a.Equals(b);
     }
 }

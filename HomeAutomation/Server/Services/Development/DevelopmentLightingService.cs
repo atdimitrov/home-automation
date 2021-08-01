@@ -9,8 +9,6 @@ namespace HomeAutomation.Server.Services.Development
 
         public State GetState() => this.state;
 
-        public void TurnOn() => this.state = State.On;
-        
-        public void TurnOff() => this.state = State.Off;
+        public void SetState(State newState) => this.state = newState;
     }
 }

@@ -31,15 +31,18 @@ namespace HomeAutomation.Server
                 services.AddSingleton<IHeaterService, DevelopmentHeaterService>();
                 services.AddSingleton<ILightingService, DevelopmentLightingService>();
                 services.AddSingleton<ITemperatureService, DevelopmentTemperatureService>();
+                services.AddSingleton<ISolarEventsService, DevelopmentSolarEventsService>();
+                services.AddSingleton<ILightingStateService, DevelopmentLightingStateService>();
             }
             else
             {
                 services.AddSingleton<IHeaterService, HeaterService>();
                 services.AddSingleton<ILightingService, LightingService>();
                 services.AddSingleton<ITemperatureService, TemperatureService>();
+                services.AddSingleton<ISolarEventsService, SolarEventsService>();
+                services.AddSingleton<ILightingStateService, LightingStateService>();
             }
 
-            services.AddSingleton<ISolarEventsService, SolarEventsService>();
             services.AddHostedService<LightingControlService>();
 
             services.AddControllersWithViews();

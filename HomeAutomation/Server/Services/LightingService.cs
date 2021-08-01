@@ -14,8 +14,6 @@ namespace HomeAutomation.Server.Services
 
         public State GetState() => this.GetPinState(LightingPin);
 
-        public void TurnOn() => this.SetPinState(LightingPin, State.On);
-
-        public void TurnOff() => this.SetPinState(LightingPin, State.Off);
+        public void SetState(State newState) => this.SetPinState(LightingPin, newState);
     }
 }

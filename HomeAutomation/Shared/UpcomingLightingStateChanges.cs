@@ -2,13 +2,13 @@
 {
     public class UpcomingLightingStateChanges
     {
-        public UpcomingLightingStateChanges(LightingStateChange nextChange, LightingStateChange nextNextChange)
+        public UpcomingLightingStateChanges(LightingStateChange firstChange, LightingStateChange secondChange)
         {
-            this.NextChange = nextChange;
-            this.NextNextChange = nextNextChange;
+            this.FirstChange = firstChange;
+            this.SecondChange = secondChange;
         }
 
-        public LightingStateChange NextChange { get; }
-        public LightingStateChange NextNextChange { get; }
+        public LightingStateChange FirstChange { get; }
+        public LightingStateChange SecondChange { get; }
     }
 }

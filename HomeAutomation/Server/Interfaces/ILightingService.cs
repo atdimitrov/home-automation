@@ -6,8 +6,6 @@ namespace HomeAutomation.Server.Interfaces
     {
         State GetState();
 
-        void TurnOn();
-
-        void TurnOff();
+        void SetState(State newState);
     }
 }

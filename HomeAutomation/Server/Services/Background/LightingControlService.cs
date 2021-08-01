@@ -12,21 +12,21 @@ namespace HomeAutomation.Server.Services.Background
     public class LightingControlService : IHostedService, IDisposable
     {
         private readonly ILogger<LightingControlService> logger;
-        private readonly ISolarEventsService solarEventsService;
+        private readonly ILightingStateService lightingStateService;
         private readonly ILightingService lightingService;
 
         private bool disposed;
         private System.Timers.Timer timer;
-        private SolarEvent nextEvent;
+        private LightingStateChange nextChange;
 
         public LightingControlService(
             ILogger<LightingControlService> logger,
-            ISolarEventsService solarEventsService,
+            ILightingStateService lightingStateService,
             ILightingService lightingService
         )
         {
             this.logger = logger;
-            this.solarEventsService = solarEventsService;
+            this.lightingStateService = lightingStateService;
             this.lightingService = lightingService;
 
             this.timer = new System.Timers.Timer();
@@ -48,15 +48,15 @@ namespace HomeAutomation.Server.Services.Background
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            SolarEvent nextEvent = this.solarEventsService.GetNextEvent();
-            if (nextEvent.Type == SolarEventType.Sunrise)
+            LightingStateChange nextChange = this.lightingStateService.GetNextChange();
+            if (nextChange.NewState == State.Off)
             {
-                this.logger.LogInformation("Initialized after sunset, turning lighting on");
+                this.logger.LogInformation($"Turning lighting on as preparation for upcoming {nextChange.SolarEvent}");
 
-                this.lightingService.TurnOn();
+                this.lightingService.SetState(State.On);
             }
 
-            this.ScheduleNextEvent(nextEvent);
+            this.ScheduleNextChange(nextChange);
 
             return Task.CompletedTask;
         }
@@ -70,43 +70,21 @@ namespace HomeAutomation.Server.Services.Background
 
         private void OnElapsed(object sender, ElapsedEventArgs e)
         {
-            string lightingOperation = this.nextEvent.Type == SolarEventType.Sunrise ? "off" : "on";
-            this.logger.LogInformation($"Turning lighting {lightingOperation} for {this.nextEvent.Type} at {this.nextEvent.Timestamp}");
+            this.logger.LogInformation($"Turning lighting {this.nextChange.NewState} for {this.nextChange.SolarEvent}");
 
-            if (this.nextEvent.Type == SolarEventType.Sunrise)
-            {
-                this.lightingService.TurnOff();
-            }
-            else
-            {
-                this.lightingService.TurnOn();
-            }
+            this.lightingService.SetState(this.nextChange.NewState);
 
-            this.ScheduleNextEvent(this.solarEventsService.GetNextEvent());
+            this.ScheduleNextChange(this.lightingStateService.GetNextChange());
         }
 
-        private void ScheduleNextEvent(SolarEvent nextEvent)
+        private void ScheduleNextChange(LightingStateChange nextChange)
         {
-            DateTime lightingOperationTimestamp = GetLightingOperationTimestampForSolarEvent(nextEvent);
+            this.logger.LogInformation($"Scheduling lighting to turn {nextChange.NewState} at {nextChange.Timestamp} for {nextChange.SolarEvent}");
 
-            string nextEventLightingOperation = nextEvent.Type == SolarEventType.Sunrise ? "off" : "on";
-            this.logger.LogInformation($"Scheduling lighting to turn {nextEventLightingOperation} at {lightingOperationTimestamp} for {nextEvent.Type} at {nextEvent.Timestamp}");
+            this.nextChange = nextChange;
 
-            this.nextEvent = nextEvent;
-
-            this.timer.Interval = (lightingOperationTimestamp - DateTime.Now).TotalMilliseconds;
+            this.timer.Interval = (nextChange.Timestamp - DateTime.Now).TotalMilliseconds;
             this.timer.Start();
-        }
-
-        private static DateTime GetLightingOperationTimestampForSolarEvent(SolarEvent solarEvent)
-        {
-            int minuteOffset = 30;
-            if (solarEvent.Type == SolarEventType.Sunrise)
-            {
-                minuteOffset *= -1;
-            }
-
-            return solarEvent.Timestamp.AddMinutes(minuteOffset);
         }
     }
 }
