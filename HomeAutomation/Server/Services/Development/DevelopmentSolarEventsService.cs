@@ -15,7 +15,7 @@ namespace HomeAutomation.Server.Services.Development
             this.solarEvents = new List<SolarEvent>();
 
             SolarEventType nextEventType = SolarEventType.Sunrise;
-            DateTime nextEventTimestamp = DateTime.Now.AddMinutes(1);
+            DateTime nextEventTimestamp = DateTime.UtcNow.AddMinutes(1);
 
             for (int i = 0; i < 1000; i++)
             {
@@ -33,6 +33,6 @@ namespace HomeAutomation.Server.Services.Development
         public SolarEvent GetThirdEvent() => this.GeUpcomingEvent(3);
 
         private SolarEvent GeUpcomingEvent(int sequenceNumber) =>
-            this.solarEvents.Where(e => e.Timestamp > DateTime.Now).Skip(sequenceNumber - 1).First();
+            this.solarEvents.Where(e => e.Timestamp > DateTime.UtcNow).Skip(sequenceNumber - 1).First();
     }
 }

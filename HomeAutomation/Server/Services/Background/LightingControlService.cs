@@ -83,7 +83,7 @@ namespace HomeAutomation.Server.Services.Background
 
             this.nextChange = nextChange;
 
-            this.timer.Interval = (nextChange.Timestamp - DateTime.Now).TotalMilliseconds;
+            this.timer.Interval = (nextChange.Timestamp - DateTime.UtcNow).TotalMilliseconds;
             this.timer.Start();
         }
     }

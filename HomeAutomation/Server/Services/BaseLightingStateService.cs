@@ -17,7 +17,7 @@ namespace HomeAutomation.Server.Services
         {
             SolarEvent firstSolarEvent = this.solarEventsService.GetFirstEvent();
             LightingStateChange nextChange = GetStateChangeFromSolarEvent(firstSolarEvent);
-            if (nextChange.Timestamp <= DateTime.Now)
+            if (nextChange.Timestamp <= DateTime.UtcNow)
             {
                 SolarEvent secondSolarEvent = this.solarEventsService.GetSecondEvent();
                 nextChange = GetStateChangeFromSolarEvent(secondSolarEvent);
