@@ -31,7 +31,7 @@ namespace HomeAutomation.Server.Services.Background
 
             this.timer = new System.Timers.Timer();
             this.timer.AutoReset = false;
-            this.timer.Elapsed += OnElapsed;
+            this.timer.Elapsed += this.OnElapsed;
         }
 
         public void Dispose()

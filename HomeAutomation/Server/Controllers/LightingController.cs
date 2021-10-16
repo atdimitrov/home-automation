@@ -1,5 +1,4 @@
 ﻿using HomeAutomation.Server.Interfaces;
-using HomeAutomation.Shared;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeAutomation.Server.Controllers

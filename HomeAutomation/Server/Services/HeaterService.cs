@@ -7,7 +7,8 @@ namespace HomeAutomation.Server.Services
 {
     public class HeaterService : BaseGpioService, IHeaterService
     {
-        private static readonly int[] HeatersPins = new int[] { 20, 21 };
+        private static readonly int[] HeatersPins = new int[] { 21, 20 };
+        private static readonly int PrimaryHeaterPin = HeatersPins[0];
 
         public HeaterService()
             : base(HeatersPins)
@@ -21,7 +22,7 @@ namespace HomeAutomation.Server.Services
             for (int i = 0; i < HeatersPins.Length; i++)
             {
                 State state = GetPinState(HeatersPins[i]);
-                heaters.Add(new Heater(i, state));
+                heaters.Add(new Heater(i, state, HeatersPins[i] == PrimaryHeaterPin));
             }
 
             return heaters;

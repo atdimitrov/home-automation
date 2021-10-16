@@ -28,7 +28,10 @@ namespace HomeAutomation.Server
         {
             if (this.Env.IsDevelopment())
             {
-                services.AddSingleton<IHeaterService, DevelopmentHeaterService>();
+                services.AddSingleton<DevelopmentHeaterService>();
+                services.AddSingleton<IHeaterService>(
+                    services => new PrimaryControlledHeaterService(services.GetRequiredService<DevelopmentHeaterService>())
+                );
                 services.AddSingleton<ILightingService, DevelopmentLightingService>();
                 services.AddSingleton<ITemperatureService, DevelopmentTemperatureService>();
                 services.AddSingleton<ISolarEventsService, DevelopmentSolarEventsService>();
@@ -36,14 +39,22 @@ namespace HomeAutomation.Server
             }
             else
             {
-                services.AddSingleton<IHeaterService, HeaterService>();
+                services.AddSingleton<HeaterService>();
+                services.AddSingleton<IHeaterService>(
+                    services => new PrimaryControlledHeaterService(services.GetRequiredService<HeaterService>())
+                );
                 services.AddSingleton<ILightingService, LightingService>();
                 services.AddSingleton<ITemperatureService, TemperatureService>();
                 services.AddSingleton<ISolarEventsService, SolarEventsService>();
                 services.AddSingleton<ILightingStateService, LightingStateService>();
             }
 
+            services.AddSingleton<IStorageService, RedisStorageService>();
+            services.AddSingleton<IHeatingService, HeatingService>();
+            services.AddSingleton<IHeatingLogicService, HeatingLogicService>();
+
             services.AddHostedService<LightingControlService>();
+            services.AddHostedService<AutomaticHeatingControlService>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();

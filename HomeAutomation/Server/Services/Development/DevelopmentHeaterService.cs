@@ -20,7 +20,7 @@ namespace HomeAutomation.Server.Services.Development
 
         public List<Heater> GetHeaters()
         {
-            return this.heaters.Select(pair => new Heater(pair.Key, pair.Value)).ToList();
+            return this.heaters.Select(pair => new Heater(pair.Key, pair.Value, pair.Key == 0)).ToList();
         }
 
         public void ToggleHeater(Heater heater)

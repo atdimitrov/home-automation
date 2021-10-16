@@ -1,6 +1,6 @@
 ﻿@page "/lighting"
-@inject HttpClient Http
-@inject IJSRuntime JS
+@inject HttpClient http
+@inject LocalDateTimeConverter converter
 @using HomeAutomation.Shared
 
 <h1>Lighting</h1>
@@ -13,18 +13,18 @@
 
     <div style="margin: 10px">
         <p>Next lighting state change: @this.upcomingStateChanges.FirstChange.NewState
-            at @this.ConvertToLocalTime(this.upcomingStateChanges.FirstChange.Timestamp)</p>
+            at @this.converter.ConvertToLocalDateTime(this.upcomingStateChanges.FirstChange.Timestamp)</p>
 
         <p>Next solar event: @this.upcomingStateChanges.FirstChange.SolarEvent.Type
-            at @this.ConvertToLocalTime(this.upcomingStateChanges.FirstChange.SolarEvent.Timestamp)</p>
+            at @this.converter.ConvertToLocalDateTime(this.upcomingStateChanges.FirstChange.SolarEvent.Timestamp)</p>
     </div>
 
     <div style="margin: 10px">
         <p>Next next lighting state change: @this.upcomingStateChanges.SecondChange.NewState at
-            @this.ConvertToLocalTime(this.upcomingStateChanges.SecondChange.Timestamp)</p>
+            @this.converter.ConvertToLocalDateTime(this.upcomingStateChanges.SecondChange.Timestamp)</p>
 
         <p>Next next solar event: @this.upcomingStateChanges.SecondChange.SolarEvent.Type at
-            @this.ConvertToLocalTime(this.upcomingStateChanges.SecondChange.SolarEvent.Timestamp)</p>
+            @this.converter.ConvertToLocalDateTime(this.upcomingStateChanges.SecondChange.SolarEvent.Timestamp)</p>
     </div>
 }
 else
@@ -33,22 +33,15 @@ else
 }
 
 @code {
-    private int timezoneOffset;
     private State state;
     private UpcomingLightingStateChanges upcomingStateChanges;
     private bool loaded = false;
 
     protected override async Task OnInitializedAsync()
     {
-        this.timezoneOffset = await JS.InvokeAsync<int>("getClientTimezoneOffset");
-
-        this.state = await Http.GetFromJsonAsync<State>("/api/lighting/getState");
-        this.upcomingStateChanges = await Http.GetFromJsonAsync<UpcomingLightingStateChanges>("/api/lighting/getUpcomingStateChanges");
+        await this.converter.Initialize();
+        this.state = await this.http.GetFromJsonAsync<State>("/api/lighting/getState");
+        this.upcomingStateChanges = await this.http.GetFromJsonAsync<UpcomingLightingStateChanges>("/api/lighting/getUpcomingStateChanges");
         this.loaded = true;
-    }
-
-    private DateTime ConvertToLocalTime(DateTime dateTime)
-    {
-        return dateTime.Add(TimeSpan.FromMinutes(-this.timezoneOffset));
     }
 }

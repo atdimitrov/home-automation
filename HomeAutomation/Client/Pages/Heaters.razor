@@ -1,18 +1,50 @@
 ﻿@page "/heaters"
 @inject HttpClient Http
-@using HomeAutomation.Shared 
+@inject LocalDateTimeConverter converter
+@using HomeAutomation.Shared
 
 <h3>Heaters</h3>
 
-@if (this.heaters != null)
+@if (!this.loading)
 {
     @foreach (Heater heater in this.heaters)
     {
         <div style="margin: 10px">
             <span>Heater @heater.Id - @heater.State</span>
-            <button class="btn btn-primary" @onclick="() => ToggleHeater(heater)">Toggle</button>
+            <button class="btn btn-primary"
+                    disabled="@(this.configuration.ControlMode == ControlMode.Automatic)"
+                    @onclick="() => ToggleHeater(heater)">
+                Toggle
+            </button>
         </div>
     }
+
+    <div style="margin: 10px">
+        <span>Control mode: @this.configuration.ControlMode</span>
+        <button class="btn btn-primary" @onclick="() => ToggleControlMode()">Toggle</button>
+    </div>
+
+    <div style="margin: 10px">
+        <span>Target temperature: </span>
+        <input type="number"
+               min="20"
+               max="30"
+               step="0.1"
+               value="@this.configuration.TargetTemperature"
+               @onchange="e => SetTargetTemperature(Convert.ToDouble(e.Value))" />
+    </div>
+
+    <div style="margin: 10px">
+        <span>Night mode start time: @this.converter.ConvertToLocalDateTime(this.configuration.NightModeStartTime).ToShortTimeString()</span>
+    </div>
+
+    <div style="margin: 10px">
+        <span>Night mode end time: @this.converter.ConvertToLocalDateTime(this.configuration.NightModeEndTime).ToShortTimeString()</span>
+    </div>
+
+    <div style="margin: 10px">
+        <span>Current operation mode: @this.configuration.OperationMode mode</span>
+    </div>
 }
 else
 {
@@ -20,11 +52,17 @@ else
 }
 
 @code {
+    private bool loading = true;
     private Heater[] heaters;
+    private HeatingConfiguration configuration;
 
     protected override async Task OnInitializedAsync()
     {
         await RefreshHeaters();
+        await RefreshConfiguration();
+        await this.converter.Initialize();
+
+        this.loading = false;
     }
 
     private async Task ToggleHeater(Heater heater)
@@ -33,8 +71,27 @@ else
         await RefreshHeaters();
     }
 
+    private async Task ToggleControlMode()
+    {
+        await Http.PostAsync("api/Heating/ToggleControlMode", null);
+        await RefreshConfiguration();
+        await RefreshHeaters();
+    }
+
+    private async Task SetTargetTemperature(double newTarget)
+    {
+        await Http.PostAsJsonAsync("api/Heating/SetTargetTemperature", newTarget);
+        await RefreshConfiguration();
+        await RefreshHeaters();
+    }
+
     private async Task RefreshHeaters()
     {
         this.heaters = await Http.GetFromJsonAsync<Heater[]>("api/Heaters/Get");
+    }
+
+    private async Task RefreshConfiguration()
+    {
+        this.configuration = await Http.GetFromJsonAsync<HeatingConfiguration>("api/Heating/Get");
     }
 }
