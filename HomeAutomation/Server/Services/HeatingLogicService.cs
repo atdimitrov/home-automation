@@ -1,6 +1,7 @@
 ﻿using HomeAutomation.Server.Interfaces;
 using HomeAutomation.Shared;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace HomeAutomation.Server.Services
@@ -9,13 +10,13 @@ namespace HomeAutomation.Server.Services
     {
         private readonly ITemperatureService temperatureService;
         private readonly IHeatingService heatingService;
+        private readonly IHeaterService heaterService;
 
-        private uint targetNumberOfRunningHeaters = 0;
-
-        public HeatingLogicService(ITemperatureService temperatureService, IHeatingService heatingService)
+        public HeatingLogicService(ITemperatureService temperatureService, IHeatingService heatingService, IHeaterService heaterService)
         {
             this.temperatureService = temperatureService;
             this.heatingService = heatingService;
+            this.heaterService = heaterService;
         }
 
         /// <summary>
@@ -48,33 +49,33 @@ namespace HomeAutomation.Server.Services
             double targetTemperature = await this.heatingService.GetTargetTemperature();
             double dT = currentTemperature - targetTemperature;
 
-            switch (this.targetNumberOfRunningHeaters)
+            uint numberOfRunningHeaters = (uint)this.heaterService.GetHeaters().Count(h => h.State == State.On);
+            switch (numberOfRunningHeaters)
             {
                 case 0:
                     if (dT <= 1)
-                        this.targetNumberOfRunningHeaters = 1;
+                        numberOfRunningHeaters = 1;
                     break;
                 case 1:
                     if (dT >= 2)
-                        this.targetNumberOfRunningHeaters = 0;
+                        numberOfRunningHeaters = 0;
                     else if (dT <= -0.5)
-                        this.targetNumberOfRunningHeaters = 2;
+                        numberOfRunningHeaters = 2;
                     break;
                 case 2:
                     if (dT >= 0.5)
-                        this.targetNumberOfRunningHeaters = 1;
+                        numberOfRunningHeaters = 1;
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
-            if (await this.heatingService.GetOperationMode() == OperationMode.Night &&
-                this.targetNumberOfRunningHeaters == 1)
+            if (await this.heatingService.GetOperationMode() == OperationMode.Night && numberOfRunningHeaters < 2)
             {
-                this.targetNumberOfRunningHeaters = 2;
+                numberOfRunningHeaters++;
             }
 
-            return Result<uint>.Success(this.targetNumberOfRunningHeaters);
+            return Result<uint>.Success(numberOfRunningHeaters);
         }
     }
 }
