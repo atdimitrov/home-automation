@@ -50,26 +50,44 @@ namespace HomeAutomation.Server.Services
             double dT = currentTemperature - targetTemperature;
 
             uint numberOfRunningHeaters = (uint)this.heaterService.GetHeaters().Count(h => h.State == State.On);
-            switch (numberOfRunningHeaters)
+            bool hasStateChange;
+            do
             {
-                case 0:
-                    if (dT <= 1)
-                        numberOfRunningHeaters = 1;
-                    break;
-                case 1:
-                    if (dT >= 2)
-                        numberOfRunningHeaters = 0;
-                    else if (dT <= -0.5)
-                        numberOfRunningHeaters = 2;
-                    break;
-                case 2:
-                    if (dT >= 0.5)
-                        numberOfRunningHeaters = 1;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+                hasStateChange = false;
 
+                switch (numberOfRunningHeaters)
+                {
+                    case 0:
+                        if (dT <= 1)
+                        {
+                            numberOfRunningHeaters = 1;
+                            hasStateChange = true;
+                        }
+                        break;
+                    case 1:
+                        if (dT >= 2)
+                        {
+                            numberOfRunningHeaters = 0;
+                            hasStateChange = true;
+                        }
+                        else if (dT <= -0.5)
+                        {
+                            numberOfRunningHeaters = 2;
+                            hasStateChange = true;
+                        }
+                        break;
+                    case 2:
+                        if (dT >= 0.5)
+                        {
+                            numberOfRunningHeaters = 1;
+                            hasStateChange = true;
+                        }
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            } while (hasStateChange);
+            
             if (await this.heatingService.GetOperationMode() == OperationMode.Night && numberOfRunningHeaters < 2)
             {
                 numberOfRunningHeaters++;
